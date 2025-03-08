@@ -1,0 +1,47 @@
+# General
+.DS_Store
+Thumbs.db
+
+# Virtual Environment (Python)
+venv/
+.env
+*.pyc
+__pycache__/
+instance/
+
+# FastAPI Specific
+*.log
+*.sqlite3
+*.db
+*.db-journal
+
+# Node.js & React
+node_modules/
+npm-debug.log
+yarn-error.log
+dist/
+build/
+.cache/
+.vscode/
+
+# Dependencies and Package Managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment Variables
+.env.local
+.env.development
+.env.production
+.env.test
+
+# IDE & Editor settings
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Coverage & Testing
+coverage/
+pytest_cache/
+junit.xml
