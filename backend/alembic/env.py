@@ -5,6 +5,7 @@ from sqlmodel import SQLModel
 
 from alembic import context
 from app.config import get_config
+from app.models.bountyprogram import BountyProgram  # noqa: F401
 
 # When you create a new table please add here
 from app.models.payment import Payment  # noqa: F401
