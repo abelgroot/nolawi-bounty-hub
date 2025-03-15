@@ -1,6 +1,5 @@
 import enum
 from datetime import datetime
-from typing import Optional
 from uuid import UUID, uuid4
 
 from sqlmodel import Column, Enum, Field, SQLModel
@@ -8,8 +7,7 @@ from sqlmodel import Column, Enum, Field, SQLModel
 
 class PaymentStatus(str, enum.Enum):
     PENDING = "pending"
-    APPROVED = "approved"
-    REJECTED = "rejected"
+    PAID = "paid"
 
 
 class Payment(SQLModel, table=True):
@@ -24,5 +22,37 @@ class Payment(SQLModel, table=True):
         default=PaymentStatus.PENDING,
         sa_column=Column(Enum(PaymentStatus)),
     )
-    paid_at: Optional[datetime] = None
-    transaction_id: Optional[UUID] = None
+    submission_id: UUID = Field(foreign_key="submission.id")
+    admin_id: UUID = Field(foreign_key="user.id")
+    paid_at: datetime | None = None
+    transaction_id: UUID | None = None
+
+
+class PaymentCreate(SQLModel):
+    amount: float
+    status: PaymentStatus = PaymentStatus.PENDING
+    submission_id: UUID = Field(foreign_key="submission.id")
+    admin_id: UUID = Field(foreign_key="user.id")
+    transaction_id: UUID | None = None
+    paid_at: datetime | None = None
+
+
+class PaymentRead(SQLModel):
+    id: UUID
+    created_at: datetime
+    updated_at: datetime
+    amount: float
+    status: PaymentStatus
+    submission_id: UUID = Field(foreign_key="submission.id")
+    admin_id: UUID = Field(foreign_key="user.id")
+    paid_at: datetime | None = None
+    transaction_id: UUID | None = None
+
+
+class PaymentUpdate(SQLModel):
+    status: PaymentStatus
+    paid_at: datetime = Field(
+        default_factory=datetime.now,
+        sa_column_kwargs={"onupdate": datetime.now},
+    )
+    transaction_id: UUID = Field(default_factory=uuid4)
