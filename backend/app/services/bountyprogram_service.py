@@ -49,7 +49,7 @@ class BountyProgramService:
         self.session.add(bountyprogram)
         self.session.commit()
         self.session.refresh(bountyprogram)
-
+        self.session.close()
         return BountyProgramRead.from_orm(bountyprogram)
 
     def get_bountyprograms(self) -> list[BountyProgram]:

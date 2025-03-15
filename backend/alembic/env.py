@@ -1,5 +1,6 @@
 from logging.config import fileConfig
 
+import alembic_postgresql_enum  # noqa: F401
 from sqlalchemy import engine_from_config, pool
 from sqlmodel import SQLModel
 
@@ -10,6 +11,7 @@ from app.models.participant import Participant  # noqa: F401
 
 # When you create a new table please add here
 from app.models.payment import Payment  # noqa: F401
+from app.models.submission import Submission  # noqa: F401
 from app.models.user import User  # noqa: F401
 
 config = context.config
