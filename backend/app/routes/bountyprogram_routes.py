@@ -1,6 +1,7 @@
+import traceback
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Request, status
 
 from app.db import SessionDep
 from app.models.bountyprogram import (
@@ -9,6 +10,7 @@ from app.models.bountyprogram import (
     BountyProgramUpdate,
 )
 from app.services.bountyprogram_service import BountyProgramService
+from app.services.user_service import UserService
 
 bountyprogram_router = APIRouter(prefix="/bountyprograms", tags=["BountyPrograms"])
 
@@ -21,17 +23,29 @@ async def create_bountyprogram(bountyprogram: BountyProgramCreate, session: Sess
 
 
 @bountyprogram_router.get("/")
-async def get_bountyprograms(session: SessionDep):
-    bountyprogram_service = BountyProgramService(session)
-    bountyprograms = bountyprogram_service.get_bountyprograms()
-    return bountyprograms
+async def get_all_bountyprograms(
+    request: Request,
+    session: SessionDep,
+):
+    try:
+        user_service = UserService(session)
+        user_service.get_current_user(request)
+        bountyprogram_service = BountyProgramService(session)
+        bountyprograms = bountyprogram_service.get_all_bountyprograms()
+        return bountyprograms
+    except Exception:
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Your are not authorized to access this resource.",
+        )
 
 
 @bountyprogram_router.get("/{bountyprogram_id}")
 async def get_bountyprogram(bountyprogram_id: UUID, session: SessionDep):
     bountyprogram_service = BountyProgramService(session)
-    bountyprograms = bountyprogram_service.get_bountyprogram(bountyprogram_id)
-    return bountyprograms
+    bountyprogram = bountyprogram_service.get_bountyprogram(bountyprogram_id)
+    return bountyprogram
 
 
 @bountyprogram_router.post("/{bountyprogram_id}")
@@ -41,9 +55,7 @@ async def update_bountyprogram(
     session: SessionDep,
 ):
     bountyprogram_service = BountyProgramService(session)
-    bountyprograms = bountyprogram_service.update_bountyprogram(
-        bountyprogram_id, bountyprogram_update
-    )
+    bountyprograms = bountyprogram_service.update_bountyprogram(bountyprogram_id, bountyprogram_update)
     return bountyprograms
 
 

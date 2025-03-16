@@ -11,6 +11,7 @@ from app.models.bountyprogram import (
     BountyProgramRead,
     BountyProgramUpdate,
 )
+from app.models.participant import Participant
 from app.models.user import User, UserType
 
 
@@ -18,9 +19,7 @@ class BountyProgramService:
     def __init__(self, session: Session):
         self.session = session
 
-    def create_bountyprogram(
-        self, bountyprogram_create: BountyProgramCreate
-    ) -> BountyProgramRead:
+    def create_bountyprogram(self, bountyprogram_create: BountyProgramCreate) -> BountyProgramRead:
         program_query = select(BountyProgram).where(
             BountyProgram.owner_id == bountyprogram_create.owner_id,
             BountyProgram.name == bountyprogram_create.name,
@@ -65,8 +64,16 @@ class BountyProgramService:
         self.session.close()
         return BountyProgramRead.from_orm(bountyprogram)
 
-    def get_bountyprograms(self) -> list[BountyProgram]:
+    def get_all_bountyprograms(self) -> list[BountyProgram]:
         return self.session.query(BountyProgram).all()
+
+    def get_bountyprograms(self, company_id: UUID) -> list[BountyProgram]:
+        return self.session.query(BountyProgram).where(BountyProgram.owner_id == company_id).all()
+
+    def get_hacker_joined_programs(self, hacker_id: UUID) -> list[BountyProgram]:
+        hacker_participations = self.session.query(Participant).where(Participant.hacker_id == hacker_id).all()
+        program_ids = [participation.program_id for participation in hacker_participations]
+        return self.session.query(BountyProgram).where(BountyProgram.id.in_(program_ids)).all()
 
     def get_bountyprogram(self, bountyprogram_id: UUID) -> BountyProgram:
         query = select(BountyProgram).where(BountyProgram.id == bountyprogram_id)

@@ -13,26 +13,20 @@ class ParticipantService:
     def __init__(self, session: Session):
         self.session = session
 
-    def create_participant(
-        self, participant_create: ParticipantCreate
-    ) -> ParticipantRead:
+    def create_participant(self, participant_create: ParticipantCreate) -> ParticipantRead:
         # Check if the hacker is already participating in the program
         existing_participant_query = select(Participant).where(
             Participant.hacker_id == participant_create.hacker_id,
             Participant.program_id == participant_create.program_id,
         )
-        existing_participant = self.session.execute(
-            existing_participant_query
-        ).scalar_one_or_none()
+        existing_participant = self.session.execute(existing_participant_query).scalar_one_or_none()
 
         if existing_participant:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Hacker is already participating in this program",
             )
-        user_query = select(BountyProgram).where(
-            BountyProgram.id == participant_create.program_id
-        )
+        user_query = select(BountyProgram).where(BountyProgram.id == participant_create.program_id)
         result = self.session.execute(user_query)
         program = result.scalar_one_or_none()
 
@@ -60,8 +54,11 @@ class ParticipantService:
         self.session.close()
         return ParticipantRead.from_orm(participant)
 
-    def get_paricipants(self) -> list[Participant]:
-        return self.session.query(Participant).all()
+    def get_participation(self, hacker_id: UUID) -> list[BountyProgram]:
+        participation = self.session.query(Participant).where(Participant.hacker_id == hacker_id).all()
+        program_ids = [p.program_id for p in participation]
+        programs = self.session.query(BountyProgram).where(BountyProgram.id.in_(program_ids)).all()
+        return programs
 
     def get_participant(self, participant_id: UUID) -> Participant:
         query = select(Participant).where(Participant.id == participant_id)

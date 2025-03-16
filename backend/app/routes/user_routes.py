@@ -1,12 +1,33 @@
+from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from app.db import SessionDep
-from app.models.user import UserCreate, UserRead, UserUpdate
+from app.models.user import AuthUser, UserCreate, UserRead, UserUpdate
 from app.services.user_service import UserService
 
 user_router = APIRouter(prefix="/users", tags=["Users"])
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
+auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+
+@auth_router.post("/login", response_model=AuthUser)
+def login_user(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    session: SessionDep,
+):
+    try:
+        user_service = UserService(session)
+        email = form_data.username
+        password = form_data.password
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid request")
+
+    token, user = user_service.authenticate_user(email, password)
+    return AuthUser(user=UserRead.model_validate(user), token=token)
 
 
 @user_router.post("/", response_model=UserRead)
@@ -23,11 +44,21 @@ async def get_users(session: SessionDep):
     return users
 
 
-@user_router.get("/{user_id}")
-async def get_user(user_id: UUID, session: SessionDep):
+@user_router.get("/companies")
+async def get_companies(session: SessionDep):
     user_service = UserService(session)
-    users = user_service.get_user(user_id)
+    users = user_service.get_companies()
     return users
+
+
+@user_router.get("/{user_id}")
+async def get_user(request: Request, user_id: str, session: SessionDep):
+    user_service = UserService(session)
+    if user_id == "me":
+        user = user_service.get_current_user(request)
+    else:
+        user = user_service.get_user(request=request, user_id=UUID(user_id))
+    return user
 
 
 @user_router.post("/{user_id}")
