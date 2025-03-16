@@ -3,6 +3,7 @@ from datetime import datetime
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel as PydanticBaseModel
 from sqlmodel import Column, Enum, Field, SQLModel
 
 
@@ -43,3 +44,13 @@ class UserRead(SQLModel):
 class UserUpdate(BaseModel):
     email: EmailStr | None = None
     password: str | None = None
+
+
+class Token(PydanticBaseModel):
+    access_token: str
+    token_type: str
+
+
+class AuthUser(PydanticBaseModel):
+    user: UserRead
+    token: Token

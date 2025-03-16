@@ -8,6 +8,7 @@ load_dotenv()
 
 class Config(BaseSettings):
     db_connection_url: str
+    signing_secret: str
 
 
 @lru_cache
