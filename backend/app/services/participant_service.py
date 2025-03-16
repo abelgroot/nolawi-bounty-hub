@@ -16,6 +16,20 @@ class ParticipantService:
     def create_participant(
         self, participant_create: ParticipantCreate
     ) -> ParticipantRead:
+        # Check if the hacker is already participating in the program
+        existing_participant_query = select(Participant).where(
+            Participant.hacker_id == participant_create.hacker_id,
+            Participant.program_id == participant_create.program_id,
+        )
+        existing_participant = self.session.execute(
+            existing_participant_query
+        ).scalar_one_or_none()
+
+        if existing_participant:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Hacker is already participating in this program",
+            )
         user_query = select(BountyProgram).where(
             BountyProgram.id == participant_create.program_id
         )

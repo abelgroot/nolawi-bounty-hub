@@ -21,27 +21,30 @@ class Submission(SQLModel, table=True):
         default_factory=datetime.now,
         sa_column_kwargs={"onupdate": datetime.now},
     )
-    participant_id: UUID = Field(foreign_key="participant.id")
+    participant_id: UUID = Field(foreign_key="participant.id", unique=True)
     hacker_id: UUID = Field(foreign_key="user.id")
     updater_id: UUID | None = Field(foreign_key="user.id", nullable=True)
     description: str
     details: str
+    feedback: str | None = None
 
 
 class SubmissionCreate(SQLModel):
-    status: SubmissionStatus = SubmissionStatus.PENDING
     participant_id: UUID = Field(foreign_key="participant.id")
     hacker_id: UUID = Field(foreign_key="user.id")
-    updater_id: UUID | None = Field(foreign_key="user.id", nullable=True)
     description: str
     details: str
 
 
 class SubmissionUpdate(SQLModel):
-    status: SubmissionStatus
     description: str
     details: str
+
+
+class SubmissionUpdateFeedback(SQLModel):
+    status: SubmissionStatus
     updater_id: UUID | None = Field(foreign_key="user.id", nullable=True)
+    feedback: str | None = None
 
 
 class SubmissionRead(SQLModel):
@@ -54,3 +57,4 @@ class SubmissionRead(SQLModel):
     updater_id: UUID | None = Field(foreign_key="user.id", nullable=True)
     description: str | None = None
     details: str | None = None
+    feedback: str | None = None

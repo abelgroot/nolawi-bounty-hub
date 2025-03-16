@@ -3,7 +3,12 @@ from uuid import UUID
 from fastapi import APIRouter
 
 from app.db import SessionDep
-from app.models.submission import SubmissionCreate, SubmissionRead, SubmissionUpdate
+from app.models.submission import (
+    SubmissionCreate,
+    SubmissionRead,
+    SubmissionUpdate,
+    SubmissionUpdateFeedback,
+)
 from app.services.submission_service import SubmissionService
 
 submission_router = APIRouter(prefix="/submissions", tags=["Submissions"])
@@ -41,10 +46,14 @@ async def update_submission(
     return submission
 
 
-@submission_router.delete("/{submission_id}")
-async def delete_submission(
+@submission_router.post("/feedback/{submission_id}")
+async def update_submission_feedback(
     submission_id: UUID,
+    submission_update_feedback: SubmissionUpdateFeedback,
     session: SessionDep,
 ):
     submission_service = SubmissionService(session)
-    return submission_service.delete_submission(submission_id)
+    submission = submission_service.update_submissionFeedback(
+        submission_id, submission_update_feedback
+    )
+    return submission

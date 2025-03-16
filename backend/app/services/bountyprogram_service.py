@@ -21,6 +21,19 @@ class BountyProgramService:
     def create_bountyprogram(
         self, bountyprogram_create: BountyProgramCreate
     ) -> BountyProgramRead:
+        program_query = select(BountyProgram).where(
+            BountyProgram.owner_id == bountyprogram_create.owner_id,
+            BountyProgram.name == bountyprogram_create.name,
+        )
+        program_result = self.session.execute(program_query)
+        program = program_result.scalar_one_or_none()
+
+        if program:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Bounty program already exists",
+            )
+
         # Validate owner_id exists and is of type 'company'
         user_query = select(User).where(User.id == bountyprogram_create.owner_id)
         result = self.session.execute(user_query)
