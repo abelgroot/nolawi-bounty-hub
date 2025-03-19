@@ -16,7 +16,7 @@ class BountyProgram(SQLModel, table=True):
     name: str
     description: str
     reward_amount: float
-    owner_id: UUID = Field(foreign_key="user.id")
+    owner_id: UUID = Field(foreign_key="user.id", ondelete="CASCADE")
     status: ProgramStatus = Field(
         default=ProgramStatus.OPEN,
         sa_column=Column(Enum(ProgramStatus)),
@@ -32,8 +32,6 @@ class BountyProgramCreate(BaseModel):
     name: str
     description: str
     reward_amount: float
-    owner_id: UUID = Field(foreign_key="user.id")
-    status: ProgramStatus = ProgramStatus.OPEN
 
 
 class BountyProgramUpdate(BaseModel):
@@ -45,9 +43,10 @@ class BountyProgramUpdate(BaseModel):
 
 class BountyProgramRead(SQLModel):
     id: UUID
+    name: str
     description: str
     reward_amount: float
-    owner_id: UUID = Field(foreign_key="user.id")
+    owner_id: UUID
     status: ProgramStatus
     created_at: datetime
     updated_at: datetime

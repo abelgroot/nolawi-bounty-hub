@@ -15,7 +15,7 @@ participant_router = APIRouter(prefix="/participation", tags=["Participants"])
 @participant_router.get("/hacker/{hacker_id}")
 async def get_participation(hacker_id: UUID, session: SessionDep):
     participant_service = ParticipantService(session)
-    participants = participant_service.get_participation(hacker_id)
+    participants = participant_service.get_participations(hacker_id)
     return participants
 
 
@@ -33,10 +33,11 @@ async def get_participant(participant_id: UUID, session: SessionDep):
     return participant
 
 
-@participant_router.delete("/{participant_id}")
+@participant_router.delete("/{program_id}/{hacker_id}")
 async def delete_participant(
-    participant_id: UUID,
+    program_id: UUID,
+    hacker_id: UUID,
     session: SessionDep,
 ):
     participant_service = ParticipantService(session)
-    return participant_service.delete_participant(participant_id)
+    return participant_service.delete_participant(program_id=program_id, hacker_id=hacker_id)

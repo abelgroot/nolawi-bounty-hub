@@ -54,11 +54,20 @@ class ParticipantService:
         self.session.close()
         return ParticipantRead.from_orm(participant)
 
-    def get_participation(self, hacker_id: UUID) -> list[BountyProgram]:
-        participation = self.session.query(Participant).where(Participant.hacker_id == hacker_id).all()
-        program_ids = [p.program_id for p in participation]
-        programs = self.session.query(BountyProgram).where(BountyProgram.id.in_(program_ids)).all()
-        return programs
+    def get_participation(self, hacker_id: UUID, program_id: UUID) -> Participant | None:
+        query = select(Participant).where(
+            Participant.hacker_id == hacker_id,
+            Participant.program_id == program_id,
+        )
+        return self.session.execute(query).scalar_one_or_none()
+
+    def get_participations(self, hacker_id: UUID) -> list[BountyProgram]:
+        query = select(Participant).where(Participant.hacker_id == hacker_id)
+        participants = self.session.execute(query).scalars().all()
+        program_ids = [participant.program_id for participant in participants]
+        query = select(BountyProgram).where(BountyProgram.id.in_(program_ids))
+        programs = self.session.execute(query).scalars().all()
+        return list(programs)
 
     def get_participant(self, participant_id: UUID) -> Participant:
         query = select(Participant).where(Participant.id == participant_id)
@@ -72,9 +81,12 @@ class ParticipantService:
             )
         return participant
 
-    def delete_participant(self, participant_id: UUID):
+    def delete_participant(self, program_id: UUID, hacker_id: UUID):
         try:
-            query = select(Participant).where(Participant.id == participant_id)
+            query = select(Participant).where(
+                Participant.program_id == program_id,
+                Participant.hacker_id == hacker_id,
+            )
             result = self.session.execute(query)
             participant = result.scalar_one_or_none()
 

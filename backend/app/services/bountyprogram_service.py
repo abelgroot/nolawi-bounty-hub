@@ -10,18 +10,20 @@ from app.models.bountyprogram import (
     BountyProgramCreate,
     BountyProgramRead,
     BountyProgramUpdate,
+    ProgramStatus,
 )
 from app.models.participant import Participant
-from app.models.user import User, UserType
+from app.models.submission import Submission
+from app.models.user import User
 
 
 class BountyProgramService:
     def __init__(self, session: Session):
         self.session = session
 
-    def create_bountyprogram(self, bountyprogram_create: BountyProgramCreate) -> BountyProgramRead:
+    def create_bountyprogram(self, user: User, bountyprogram_create: BountyProgramCreate) -> BountyProgramRead:
         program_query = select(BountyProgram).where(
-            BountyProgram.owner_id == bountyprogram_create.owner_id,
+            BountyProgram.owner_id == user.id,
             BountyProgram.name == bountyprogram_create.name,
         )
         program_result = self.session.execute(program_query)
@@ -32,30 +34,12 @@ class BountyProgramService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Bounty program already exists",
             )
-
-        # Validate owner_id exists and is of type 'company'
-        user_query = select(User).where(User.id == bountyprogram_create.owner_id)
-        result = self.session.execute(user_query)
-        owner = result.scalar_one_or_none()
-
-        if not owner:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid owner_id: User does not exist",
-            )
-
-        if owner.role != UserType.COMPANY:  # Correct Enum Comparison
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid owner_id: User is not a company",
-            )
-
-        # Create bounty program
         bountyprogram = BountyProgram(
             name=bountyprogram_create.name,
             description=bountyprogram_create.description,
             reward_amount=bountyprogram_create.reward_amount,
-            owner_id=bountyprogram_create.owner_id,
+            owner_id=user.id,
+            status=ProgramStatus.OPEN,
         )
 
         self.session.add(bountyprogram)
@@ -64,8 +48,17 @@ class BountyProgramService:
         self.session.close()
         return BountyProgramRead.from_orm(bountyprogram)
 
-    def get_all_bountyprograms(self) -> list[BountyProgram]:
-        return self.session.query(BountyProgram).all()
+    def get_all_submitted_bountyprograms(self) -> list[BountyProgram]:
+        submissions = self.session.query(Submission).all()
+        submitted_program_ids = [submission.program_id for submission in submissions]
+        programs = self.session.query(BountyProgram).where(BountyProgram.id.in_(submitted_program_ids)).all()
+        return programs
+
+    def get_user_bountyprograms(
+        self,
+        user_id: UUID | None = None,
+    ) -> list[BountyProgram]:
+        return self.session.query(BountyProgram).where(BountyProgram.owner_id == user_id).all()
 
     def get_bountyprograms(self, company_id: UUID) -> list[BountyProgram]:
         return self.session.query(BountyProgram).where(BountyProgram.owner_id == company_id).all()
