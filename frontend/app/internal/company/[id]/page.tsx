@@ -2,6 +2,7 @@
 import { ProgramItem } from "@/components/program";
 import { usePrograms } from "@/hooks/usePrograms";
 import { useUser } from "@/hooks/useUser";
+import { useCurrentUser } from "@/providers/auth-provider";
 import { Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 
@@ -11,6 +12,7 @@ export default function Page() {
   }>();
 
   const { user } = useUser(id);
+  const { user: currentUser } = useCurrentUser();
   const { programs, isLoading } = usePrograms();
 
   return (
@@ -34,7 +36,7 @@ export default function Page() {
                   key={idx}
                   userId={user.id}
                   program={program}
-                  isOwner
+                  isOwner={program.ownerId === currentUser?.id}
                 />
               ))
           )}
