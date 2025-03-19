@@ -9,7 +9,7 @@ export function usePrograms() {
   const token = localStorage.getItem("token");
 
   const query = useQuery({
-    queryKey: companyProgramsKey.list("programs"),
+    queryKey: companyProgramsKey.list(`programs-${token}`),
     queryFn: () =>
       apiGet<BountyProgram[]>(url, z.array(bountyProgramSchema), token || ""),
     enabled: !!token,
