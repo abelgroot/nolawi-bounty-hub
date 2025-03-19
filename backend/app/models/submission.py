@@ -19,9 +19,9 @@ class Submission(SQLModel, table=True):
         default_factory=datetime.now,
         sa_column_kwargs={"onupdate": datetime.now},
     )
-    program_id: UUID = Field(foreign_key="bountyprogram.id", unique=True, ondelete="CASCADE")
+    program_id: UUID = Field(foreign_key="bountyprogram.id", ondelete="CASCADE")
     hacker_id: UUID = Field(foreign_key="user.id", ondelete="CASCADE")
-    updater_id: UUID | None = Field(foreign_key="user.id", nullable=True, ondelete="CASCADE")
+    updater_id: UUID | None = Field(foreign_key="user.id", ondelete="CASCADE")
     description: str
     details: str
     feedback: str | None = None
@@ -41,7 +41,6 @@ class SubmissionUpdate(SQLModel):
 
 class SubmissionUpdateFeedback(SQLModel):
     status: SubmissionStatus
-    updater_id: UUID
     feedback: str | None = None
 
 

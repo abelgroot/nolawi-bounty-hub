@@ -1,6 +1,7 @@
+import traceback
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 
 from app.db import SessionDep
 from app.models.submission import (
@@ -9,8 +10,10 @@ from app.models.submission import (
     SubmissionUpdate,
     SubmissionUpdateFeedback,
 )
+from app.models.user import UserType
 from app.services.participant_service import ParticipantService
 from app.services.submission_service import SubmissionService
+from app.services.user_service import UserService
 
 submission_router = APIRouter(prefix="/submissions", tags=["Submissions"])
 
@@ -37,11 +40,32 @@ async def create_submission(submission: SubmissionCreate, session: SessionDep):
     return new_submission
 
 
-@submission_router.get("/{hacker_id}")
-async def get_submissions(hacker_id: UUID, session: SessionDep):
-    submission_service = SubmissionService(session)
-    submissions = submission_service.get_submissions(hacker_id)
-    return submissions
+@submission_router.get("/")
+async def get_submissions(request: Request, session: SessionDep):
+    try:
+        user_service = UserService(session)
+        user = user_service.get_current_user(request)
+
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Your are not authorized to access this resource.",
+            )
+
+        submission_service = SubmissionService(session)
+        if user.role == UserType.ADMIN:
+            return submission_service.get_all_sumissions()
+        elif user.role == UserType.HACKER:
+            return submission_service.get_submissions_by_user(hacker_id=user.id)
+        else:
+            return list()
+
+    except Exception:
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Your are not authorized to access this resource.",
+        )
 
 
 @submission_router.post("/{submission_id}")
@@ -57,10 +81,32 @@ async def update_submission(
 
 @submission_router.post("/feedback/{submission_id}")
 async def update_submission_feedback(
+    request: Request,
     submission_id: UUID,
     submission_update_feedback: SubmissionUpdateFeedback,
     session: SessionDep,
 ):
-    submission_service = SubmissionService(session)
-    submission = submission_service.update_submissionFeedback(submission_id, submission_update_feedback)
-    return submission
+    try:
+        user_service = UserService(session)
+        user = user_service.get_current_user(request)
+
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Your are not authorized to perform this action.",
+            )
+
+        submission_service = SubmissionService(session)
+        submission = submission_service.update_submissionFeedback(
+            submission_id=submission_id,
+            updater=user,
+            submission_updatefeedback=submission_update_feedback,
+        )
+        return submission
+
+    except Exception:
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Your are not authorized to access this resource.",
+        )

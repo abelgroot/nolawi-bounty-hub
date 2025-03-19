@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from app.db import SessionDep
-from app.models.user import AuthUser, UserCreate, UserRead, UserUpdate
+from app.models.user import AuthUser, UserCreate, UserRead, UserType, UserUpdate
 from app.services.user_service import UserService
 
 user_router = APIRouter(prefix="/users", tags=["Users"])
@@ -38,10 +38,26 @@ async def create_user(user: UserCreate, session: SessionDep):
 
 
 @user_router.get("/")
-async def get_users(session: SessionDep):
-    user_service = UserService(session)
-    users = user_service.get_users()
-    return users
+async def get_users(request: Request, session: SessionDep):
+    try:
+        user_service = UserService(session)
+        user = user_service.get_current_user(request)
+
+        if user is None or user.role != UserType.ADMIN:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Your are not authorized to access this resource.",
+            )
+
+        user_service = UserService(session)
+        users = user_service.get_users()
+        return users
+
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Your are not authorized to access this resource.",
+        )
 
 
 @user_router.get("/companies")

@@ -54,7 +54,6 @@ class UserService:
         )
         try:
             authorization_header = request.headers.get("Authorization")
-            print(f"Authorization header: {authorization_header}")
             if not authorization_header or "Bearer" not in authorization_header:
                 raise credentials_exception
             token = authorization_header.split("Bearer ")[1]

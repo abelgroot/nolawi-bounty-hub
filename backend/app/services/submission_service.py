@@ -13,7 +13,7 @@ from app.models.submission import (
     SubmissionUpdate,
     SubmissionUpdateFeedback,
 )
-from app.models.user import User, UserType
+from app.models.user import User
 
 
 class SubmissionService:
@@ -72,6 +72,17 @@ class SubmissionService:
     def get_submissions(self, hacker_id: UUID) -> list[Submission]:
         return self.session.query(Submission).where(Submission.hacker_id == hacker_id).all()
 
+    def get_all_sumissions(self) -> list[Submission]:
+        return self.session.query(Submission).order_by(Submission.updated_at).all()
+
+    def get_submissions_by_user(self, hacker_id: UUID) -> list[Submission]:
+        return (
+            self.session.query(Submission)
+            .where(Submission.hacker_id == hacker_id)
+            .order_by(Submission.updated_at)
+            .all()
+        )
+
     def get_submission(self, submission_id: UUID) -> Submission:
         query = select(Submission).where(Submission.id == submission_id)
         result = self.session.execute(query)
@@ -104,7 +115,10 @@ class SubmissionService:
         return SubmissionRead.from_orm(submission)
 
     def update_submissionFeedback(
-        self, submission_id: UUID, submission_updatefeedback: SubmissionUpdateFeedback
+        self,
+        submission_id: UUID,
+        updater: User,
+        submission_updatefeedback: SubmissionUpdateFeedback,
     ) -> SubmissionRead:
         query = select(Submission).where(Submission.id == submission_id)
         result = self.session.execute(query)
@@ -115,26 +129,11 @@ class SubmissionService:
                 detail="no submission found",
             )
 
-        if submission_updatefeedback.updater_id:
-            user_query = select(User).where(User.id == submission_updatefeedback.updater_id)
-            user_result = self.session.execute(user_query)
-            user = user_result.scalar_one_or_none()
-            if not user:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="no updater user id found",
-                )
-            if user.role != UserType.ADMIN:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail="not authorized to update submission",
-                )
-        if submission_updatefeedback.status:
-            submission.status = submission_updatefeedback.status
-        if submission_updatefeedback.updater_id:
-            submission.updater_id = submission_updatefeedback.updater_id
+        submission.status = submission_updatefeedback.status
+        submission.updater_id = updater.id
         if submission_updatefeedback.feedback:
             submission.feedback = submission_updatefeedback.feedback
+
         self.session.add(submission)
         self.session.commit()
         self.session.refresh(submission)
