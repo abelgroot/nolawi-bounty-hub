@@ -21,7 +21,9 @@ class BountyProgramService:
     def __init__(self, session: Session):
         self.session = session
 
-    def create_bountyprogram(self, user: User, bountyprogram_create: BountyProgramCreate) -> BountyProgramRead:
+    def create_bountyprogram(
+        self, user: User, bountyprogram_create: BountyProgramCreate
+    ) -> BountyProgramRead:
         program_query = select(BountyProgram).where(
             BountyProgram.owner_id == user.id,
             BountyProgram.name == bountyprogram_create.name,
@@ -51,22 +53,47 @@ class BountyProgramService:
     def get_all_submitted_bountyprograms(self) -> list[BountyProgram]:
         submissions = self.session.query(Submission).all()
         submitted_program_ids = [submission.program_id for submission in submissions]
-        programs = self.session.query(BountyProgram).where(BountyProgram.id.in_(submitted_program_ids)).all()
+        programs = (
+            self.session.query(BountyProgram)
+            .where(BountyProgram.id.in_(submitted_program_ids))
+            .all()
+        )
         return programs
 
     def get_user_bountyprograms(
         self,
         user_id: UUID | None = None,
     ) -> list[BountyProgram]:
-        return self.session.query(BountyProgram).where(BountyProgram.owner_id == user_id).all()
+        if user_id:
+            return (
+                self.session.query(BountyProgram)
+                .where(BountyProgram.owner_id == user_id)
+                .all()
+            )
+        else:
+            return self.session.query(BountyProgram).all()
 
     def get_bountyprograms(self, company_id: UUID) -> list[BountyProgram]:
-        return self.session.query(BountyProgram).where(BountyProgram.owner_id == company_id).all()
+        return (
+            self.session.query(BountyProgram)
+            .where(BountyProgram.owner_id == company_id)
+            .all()
+        )
 
     def get_hacker_joined_programs(self, hacker_id: UUID) -> list[BountyProgram]:
-        hacker_participations = self.session.query(Participant).where(Participant.hacker_id == hacker_id).all()
-        program_ids = [participation.program_id for participation in hacker_participations]
-        return self.session.query(BountyProgram).where(BountyProgram.id.in_(program_ids)).all()
+        hacker_participations = (
+            self.session.query(Participant)
+            .where(Participant.hacker_id == hacker_id)
+            .all()
+        )
+        program_ids = [
+            participation.program_id for participation in hacker_participations
+        ]
+        return (
+            self.session.query(BountyProgram)
+            .where(BountyProgram.id.in_(program_ids))
+            .all()
+        )
 
     def get_bountyprogram(self, bountyprogram_id: UUID) -> BountyProgram:
         query = select(BountyProgram).where(BountyProgram.id == bountyprogram_id)

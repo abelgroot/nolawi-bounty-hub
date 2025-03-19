@@ -32,7 +32,9 @@ async def create_bountyprogram(
             )
 
         bountyprogram_service = BountyProgramService(session)
-        new_bountyprogram = bountyprogram_service.create_bountyprogram(user=user, bountyprogram_create=bountyprogram)
+        new_bountyprogram = bountyprogram_service.create_bountyprogram(
+            user=user, bountyprogram_create=bountyprogram
+        )
         return new_bountyprogram
     except Exception:
         print(traceback.format_exc())
@@ -64,8 +66,10 @@ async def get_all_bountyprograms(
         bountyprogram_service = BountyProgramService(session)
         if user.role == UserType.ADMIN:
             return bountyprogram_service.get_all_submitted_bountyprograms()
-        else:
+        elif user.role == UserType.COMPANY:
             return bountyprogram_service.get_user_bountyprograms(user_id=user.id)
+        else:
+            return bountyprogram_service.get_user_bountyprograms()
 
     except Exception:
         print(traceback.format_exc())
@@ -89,7 +93,9 @@ async def update_bountyprogram(
     session: SessionDep,
 ):
     bountyprogram_service = BountyProgramService(session)
-    bountyprograms = bountyprogram_service.update_bountyprogram(bountyprogram_id, bountyprogram_update)
+    bountyprograms = bountyprogram_service.update_bountyprogram(
+        bountyprogram_id, bountyprogram_update
+    )
     return bountyprograms
 
 
