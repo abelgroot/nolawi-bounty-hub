@@ -5,13 +5,16 @@ import { BountyProgram, bountyProgramSchema } from "@/schemas/program.schema";
 import { z } from "zod";
 
 export function useParticipation(hackerId?: string) {
-  const url = `/api/v1/participation/hacker/${hackerId}`;
   const token = localStorage.getItem("token");
 
   const query = useQuery({
     queryKey: participationKey.list(hackerId || ""),
     queryFn: () =>
-      apiGet<BountyProgram[]>(url, z.array(bountyProgramSchema), token || ""),
+      apiGet<BountyProgram[]>(
+        `/api/v1/participation/hacker/${hackerId}`,
+        z.array(bountyProgramSchema),
+        token || "",
+      ),
     enabled: !!hackerId && !!token,
   });
 

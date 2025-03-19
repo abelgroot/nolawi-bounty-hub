@@ -1,13 +1,13 @@
 "use client";
 import { ProgramItem } from "@/components/program";
-import { Button } from "@/components/ui/button";
 import { usePrograms } from "@/hooks/usePrograms";
 import { useCurrentUser } from "@/providers/auth-provider";
 import { Loader2 } from "lucide-react";
-import { AddProgramModal } from "./add-program-modal";
 import { useState } from "react";
+import { ReviewProgramModal } from "./review-program-modal";
+import { ProgramAdminItem } from "./program-admin-item";
 
-export default function CompanyDashboard() {
+export default function AdminDashboard() {
   const { user } = useCurrentUser();
   const { programs, isLoading } = usePrograms();
   const [isOpen, setIsOpen] = useState(false);
@@ -15,9 +15,8 @@ export default function CompanyDashboard() {
   return (
     <div className="p-10">
       <h2 className="text-xl font-semibold p-4 border-b mb-6 flex justify-between items-center">
-        <div>Campnay : {user?.email}</div>
-        <Button onClick={() => setIsOpen(true)}>Add Program</Button>
-        {isOpen && <AddProgramModal isOpen={isOpen} setIsOpen={setIsOpen} />}
+        <div>Admin : {user?.email}</div>
+        {isOpen && <ReviewProgramModal isOpen={isOpen} setIsOpen={setIsOpen} />}
       </h2>
       <div className="p-4 w-full">
         <h2 className="text-lg font-bold">Your Submitted Programs</h2>
@@ -28,16 +27,9 @@ export default function CompanyDashboard() {
             </div>
           ) : (
             user &&
-            programs
-              .filter((program) => program.ownerId == user.id)
-              .map((program, idx) => (
-                <ProgramItem
-                  key={idx}
-                  userId={user.id}
-                  program={program}
-                  isOwner
-                />
-              ))
+            programs.map((program, idx) => (
+              <ProgramAdminItem key={idx} program={program} />
+            ))
           )}
         </div>
       </div>

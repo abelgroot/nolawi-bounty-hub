@@ -41,7 +41,9 @@ export function useAuth() {
 
       router.push(`/internal/user`);
     },
-    onError: () => {},
+    onError: () => {
+      alert?.error("Invalid email or password");
+    },
   });
 
   const signUpUser = async ({

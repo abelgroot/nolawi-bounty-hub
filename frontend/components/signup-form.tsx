@@ -57,7 +57,11 @@ export function SignUpForm({
 
   const form = useForm<UserCreate>({
     resolver: zodResolver(userCreateSchema),
-    defaultValues: {},
+    defaultValues: {
+      email: "",
+      password: "",
+      repeatPassword: "",
+    },
   });
 
   function onSubmit(data: UserCreate) {
@@ -128,7 +132,7 @@ export function SignUpForm({
                     <FormLabel>Repeat Password</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Repeate Passowrd"
+                        placeholder="Repeat Passowrd"
                         {...field}
                         disabled={isSigningUp}
                       />

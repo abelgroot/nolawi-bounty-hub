@@ -10,3 +10,4 @@ export const usersKey = createQueryKeyStructure("users");
 export const companiesKey = createQueryKeyStructure("companies");
 export const companyProgramsKey = createQueryKeyStructure("company-programs");
 export const participationKey = createQueryKeyStructure("participation");
+export const submissionsKey = createQueryKeyStructure("submissions");

@@ -2,7 +2,8 @@
 import { ProgramItem } from "@/components/program";
 import { useParticipation } from "@/hooks/useParticipation";
 import { usePrograms } from "@/hooks/usePrograms";
-import { useCompanies } from "@/hooks/userCompanies";
+import { useCompanies } from "@/hooks/useCompanies";
+import { useSubmissions } from "@/hooks/useSubmissions";
 import { useCurrentUser } from "@/providers/auth-provider";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -14,8 +15,14 @@ export default function HackerDashboard() {
   const { joinedPrograms, isLoading: loadingJoined } = useParticipation(
     user?.id,
   );
+  const { submissions, isLoading: loadingSubmissions } = useSubmissions(
+    user?.id,
+  );
 
   const joinedProgramIds = joinedPrograms.map((program) => program.id);
+  const submittedProgramIds = submissions.map(
+    (submission) => submission.programId,
+  );
   const availablePrograms = programs.filter(
     (program) => !joinedProgramIds.includes(program.id),
   );
@@ -34,9 +41,12 @@ export default function HackerDashboard() {
                 <Loader2 /> loading programs ...
               </div>
             ) : (
-              availablePrograms.map((program, idx) => (
-                <ProgramItem key={idx} program={program} />
-              ))
+              availablePrograms.map(
+                (program, idx) =>
+                  user && (
+                    <ProgramItem key={idx} program={program} userId={user.id} />
+                  ),
+              )
             )}
           </div>
         </div>
@@ -44,14 +54,25 @@ export default function HackerDashboard() {
           <div className="p-4">
             <h2 className="text-lg font-bold">Your Joined Programs</h2>
             <div className="w-full flex flex-col gap-4 mt-4">
-              {loadingJoined ? (
+              {loadingJoined || loadingSubmissions ? (
                 <div>
                   <Loader2 /> loading joined programs ...
                 </div>
               ) : (
-                joinedPrograms.map((program, idx) => (
-                  <ProgramItem key={idx} program={program} joined={true} />
-                ))
+                joinedPrograms.map(
+                  (program, idx) =>
+                    user && (
+                      <ProgramItem
+                        key={idx}
+                        program={program}
+                        userId={user.id}
+                        joined={true}
+                        submission={submissions.find(
+                          (submission) => submission.programId === program.id,
+                        )}
+                      />
+                    ),
+                )
               )}
             </div>
           </div>

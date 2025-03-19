@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const UserRoleEnumValues = ["hacker", "company"] as const;
+export const UserRoleEnumValues = ["hacker", "company", "admin"] as const;
 export const UserRoleEnum = z.enum(UserRoleEnumValues, {
   errorMap: () => ({ message: "User role is required" }),
 });
