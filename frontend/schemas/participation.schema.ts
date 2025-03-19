@@ -46,4 +46,12 @@ export const submissionSchema = z.object({
   feedback: z.string().optional().nullable(),
 });
 
+export const submissionUpdateFeedbackSchema = z.object({
+  status: SubmissionEnum,
+  feedback: z.string(),
+});
+
 export type Submission = z.infer<typeof submissionSchema>;
+export type SubmissionUpdateFeedback = z.infer<
+  typeof submissionUpdateFeedbackSchema
+>;

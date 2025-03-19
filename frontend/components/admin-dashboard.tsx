@@ -3,14 +3,34 @@ import { ProgramItem } from "@/components/program";
 import { usePrograms } from "@/hooks/usePrograms";
 import { useCurrentUser } from "@/providers/auth-provider";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ReviewProgramModal } from "./review-program-modal";
-import { ProgramAdminItem } from "./program-admin-item";
+import { SubmissionItem } from "./program-admin-item";
+import { useSubmissions } from "@/hooks/useSubmissions";
+import { useUsers } from "@/hooks/useUsers";
 
 export default function AdminDashboard() {
   const { user } = useCurrentUser();
-  const { programs, isLoading } = usePrograms();
   const [isOpen, setIsOpen] = useState(false);
+  const { programs, isLoading: lodingPrograms } = usePrograms();
+  const { submissions, isLoading: loadingSubmissions } = useSubmissions();
+  const { users, isLoading: loadingUsers } = useUsers();
+
+  const getUser = useCallback(
+    (id: string) => {
+      return users.find((user) => user.id === id);
+    },
+    [users],
+  );
+
+  const getProgram = useCallback(
+    (id: string) => {
+      return programs.find((program) => program.id === id);
+    },
+    [programs],
+  );
+
+  const loading = lodingPrograms || loadingSubmissions || loadingUsers;
 
   return (
     <div className="p-10">
@@ -21,15 +41,27 @@ export default function AdminDashboard() {
       <div className="p-4 w-full">
         <h2 className="text-lg font-bold">Your Submitted Programs</h2>
         <div className="w-full flex flex-col gap-4 mt-4">
-          {isLoading ? (
+          {loading || loadingUsers ? (
             <div>
               <Loader2 /> loading programs ...
             </div>
           ) : (
             user &&
-            programs.map((program, idx) => (
-              <ProgramAdminItem key={idx} program={program} />
-            ))
+            submissions.map((submission, idx) => {
+              const submittedBy = getUser(submission.hackerId);
+              const program = getProgram(submission.programId);
+              return (
+                submittedBy &&
+                program && (
+                  <SubmissionItem
+                    key={idx}
+                    submission={submission}
+                    submittedBy={submittedBy}
+                    program={program}
+                  />
+                )
+              );
+            })
           )}
         </div>
       </div>

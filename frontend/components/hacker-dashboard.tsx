@@ -15,14 +15,9 @@ export default function HackerDashboard() {
   const { joinedPrograms, isLoading: loadingJoined } = useParticipation(
     user?.id,
   );
-  const { submissions, isLoading: loadingSubmissions } = useSubmissions(
-    user?.id,
-  );
+  const { submissions, isLoading: loadingSubmissions } = useSubmissions();
 
   const joinedProgramIds = joinedPrograms.map((program) => program.id);
-  const submittedProgramIds = submissions.map(
-    (submission) => submission.programId,
-  );
   const availablePrograms = programs.filter(
     (program) => !joinedProgramIds.includes(program.id),
   );
