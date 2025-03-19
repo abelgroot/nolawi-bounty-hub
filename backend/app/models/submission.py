@@ -13,25 +13,23 @@ class SubmissionStatus(enum.Enum):
 
 class Submission(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
-    status: SubmissionStatus = Field(
-        default=SubmissionStatus.PENDING, sa_column=Column(Enum(SubmissionStatus))
-    )
+    status: SubmissionStatus = Field(default=SubmissionStatus.PENDING, sa_column=Column(Enum(SubmissionStatus)))
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(
         default_factory=datetime.now,
         sa_column_kwargs={"onupdate": datetime.now},
     )
-    participant_id: UUID = Field(foreign_key="participant.id", unique=True)
-    hacker_id: UUID = Field(foreign_key="user.id")
-    updater_id: UUID | None = Field(foreign_key="user.id", nullable=True)
+    program_id: UUID = Field(foreign_key="bountyprogram.id", unique=True, ondelete="CASCADE")
+    hacker_id: UUID = Field(foreign_key="user.id", ondelete="CASCADE")
+    updater_id: UUID | None = Field(foreign_key="user.id", nullable=True, ondelete="CASCADE")
     description: str
     details: str
     feedback: str | None = None
 
 
 class SubmissionCreate(SQLModel):
-    participant_id: UUID = Field(foreign_key="participant.id")
-    hacker_id: UUID = Field(foreign_key="user.id")
+    program_id: UUID
+    hacker_id: UUID
     description: str
     details: str
 
@@ -43,7 +41,7 @@ class SubmissionUpdate(SQLModel):
 
 class SubmissionUpdateFeedback(SQLModel):
     status: SubmissionStatus
-    updater_id: UUID | None = Field(foreign_key="user.id", nullable=True)
+    updater_id: UUID
     feedback: str | None = None
 
 
@@ -52,9 +50,9 @@ class SubmissionRead(SQLModel):
     status: SubmissionStatus
     created_at: datetime
     updated_at: datetime
-    participant_id: UUID = Field(foreign_key="participant.id")
-    hacker_id: UUID = Field(foreign_key="user.id")
-    updater_id: UUID | None = Field(foreign_key="user.id", nullable=True)
+    program_id: UUID
+    hacker_id: UUID
+    updater_id: UUID | None
     description: str | None = None
     details: str | None = None
     feedback: str | None = None

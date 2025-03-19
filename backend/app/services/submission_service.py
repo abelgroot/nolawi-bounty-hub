@@ -20,9 +20,14 @@ class SubmissionService:
     def __init__(self, session: Session):
         self.session = session
 
-    def create_submission(self, submission_create: SubmissionCreate) -> SubmissionRead:
+    def create_submission(
+        self,
+        participant: Participant,
+        submission_create: SubmissionCreate,
+    ) -> SubmissionRead:
         submission_query = select(Submission).where(
-            Submission.participant_id == submission_create.participant_id
+            Submission.hacker_id == submission_create.hacker_id,
+            Submission.program_id == participant.program_id,
         )
         submission_result = self.session.execute(submission_query)
         current_submission = submission_result.scalar_one_or_none()
@@ -33,31 +38,16 @@ class SubmissionService:
                 detail="submission already exists",
             )
 
-        participant_query = select(Participant).where(
-            Participant.id == submission_create.participant_id
-        )
-        result = self.session.execute(participant_query)
-        participant = result.scalar_one_or_none()
-
-        if not participant:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="no participant in this program",
-            )
         if participant.hacker_id != submission_create.hacker_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="you are not authorized to submit for this program",
             )
-        program_query = select(BountyProgram).where(
-            BountyProgram.id == participant.program_id
-        )
+        program_query = select(BountyProgram).where(BountyProgram.id == participant.program_id)
         program_status = self.session.execute(program_query)
         program = program_status.scalar_one_or_none()
         if not program:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="no program found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="no program found")
         if program.status == ProgramStatus.CLOSED:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -65,7 +55,7 @@ class SubmissionService:
             )
 
         submission = Submission(
-            participant_id=submission_create.participant_id,
+            program_id=participant.program_id,
             hacker_id=submission_create.hacker_id,
             description=submission_create.description,
             details=submission_create.details,
@@ -79,8 +69,8 @@ class SubmissionService:
 
         return SubmissionRead.from_orm(submission)
 
-    def get_submissions(self) -> list[Submission]:
-        return self.session.query(Submission).all()
+    def get_submissions(self, hacker_id: UUID) -> list[Submission]:
+        return self.session.query(Submission).where(Submission.hacker_id == hacker_id).all()
 
     def get_submission(self, submission_id: UUID) -> Submission:
         query = select(Submission).where(Submission.id == submission_id)
@@ -93,9 +83,7 @@ class SubmissionService:
             )
         return submission
 
-    def update_submission(
-        self, submission_id: UUID, submission_update: SubmissionUpdate
-    ) -> SubmissionRead:
+    def update_submission(self, submission_id: UUID, submission_update: SubmissionUpdate) -> SubmissionRead:
         query = select(Submission).where(Submission.id == submission_id)
         result = self.session.execute(query)
         submission = result.scalar_one_or_none()
@@ -128,9 +116,7 @@ class SubmissionService:
             )
 
         if submission_updatefeedback.updater_id:
-            user_query = select(User).where(
-                User.id == submission_updatefeedback.updater_id
-            )
+            user_query = select(User).where(User.id == submission_updatefeedback.updater_id)
             user_result = self.session.execute(user_query)
             user = user_result.scalar_one_or_none()
             if not user:

@@ -22,8 +22,8 @@ class Payment(SQLModel, table=True):
         default=PaymentStatus.PENDING,
         sa_column=Column(Enum(PaymentStatus)),
     )
-    submission_id: UUID = Field(foreign_key="submission.id")
-    admin_id: UUID = Field(foreign_key="user.id")
+    submission_id: UUID = Field(foreign_key="submission.id", ondelete="CASCADE")
+    admin_id: UUID = Field(foreign_key="user.id", ondelete="CASCADE")
     paid_at: datetime | None = None
     transaction_id: UUID | None = None
 
@@ -31,8 +31,8 @@ class Payment(SQLModel, table=True):
 class PaymentCreate(SQLModel):
     amount: float
     status: PaymentStatus = PaymentStatus.PENDING
-    submission_id: UUID = Field(foreign_key="submission.id")
-    admin_id: UUID = Field(foreign_key="user.id")
+    submission_id: UUID
+    admin_id: UUID
     transaction_id: UUID | None = None
     paid_at: datetime | None = None
 
@@ -43,16 +43,13 @@ class PaymentRead(SQLModel):
     updated_at: datetime
     amount: float
     status: PaymentStatus
-    submission_id: UUID = Field(foreign_key="submission.id")
-    admin_id: UUID = Field(foreign_key="user.id")
+    submission_id: UUID
+    admin_id: UUID
     paid_at: datetime | None = None
     transaction_id: UUID | None = None
 
 
 class PaymentUpdate(SQLModel):
     status: PaymentStatus
-    paid_at: datetime = Field(
-        default_factory=datetime.now,
-        sa_column_kwargs={"onupdate": datetime.now},
-    )
-    transaction_id: UUID = Field(default_factory=uuid4)
+    paid_at: datetime
+    transaction_id: UUID
