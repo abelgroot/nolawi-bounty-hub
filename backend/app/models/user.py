@@ -15,6 +15,7 @@ class UserType(str, enum.Enum):
 
 class User(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
+    name: str
     email: EmailStr = Field(unique=True)
     password: str
     role: UserType = Field(
@@ -36,6 +37,7 @@ class UserCreate(BaseModel):
 class UserRead(SQLModel):
     id: UUID
     email: EmailStr
+    name: str
     role: UserType
     created_at: datetime
     updated_at: datetime
