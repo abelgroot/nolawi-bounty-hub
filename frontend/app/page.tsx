@@ -14,7 +14,8 @@ export default function HomePage() {
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                    Secure Your Digital Assets with Expert Bug Bounty Hunters
+                    Secure Your Digital Assets with Experts on Nolawi Bug Bounty
+                    Hunters Hub
                   </h1>
                   <p className="max-w-[600px] text-gray-400 md:text-xl">
                     We find vulnerabilities before hackers do. Our elite team of
