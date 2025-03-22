@@ -1,7 +1,7 @@
 ````markdown
 # Nolawi Bounty Hub
 
-![Nolawi Bounty Hub Cover Image](assets/cover-page.png)
+![Nolawi Bounty Hub Cover Image](assets/main-page.png)
 
 **Nolawi Bounty Hub** is a platform designed to connect **whitehat hackers** and **bounty hunters** with Ethiopian and African companies that lack the resources or knowledge to secure their digital platforms. By bridging this gap, Nolawi Bounty Hub empowers companies to improve their cybersecurity while providing ethical hackers with opportunities to showcase their skills.
 
