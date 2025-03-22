@@ -89,9 +89,9 @@ export function ReportSubmissionModal({
       open={isSubmittingReport ? true : isOpen}
       onOpenChange={isSubmittingReport ? undefined : setIsOpen}
     >
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl max-h-[calc(100vh-100px)] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Submit Vulnerability Reprot</DialogTitle>
+          <DialogTitle>Submit Vulnerability Report</DialogTitle>
           <DialogDescription>
             NOTICE: please submit a report that has POC and also is zero day
             vulnerability. make sure you have followed all the legal condition

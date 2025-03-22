@@ -19,8 +19,8 @@ export type Participant = z.infer<typeof participantSchema>;
 export const submissionCreateSchema = z.object({
   programId: z.string().uuid(),
   hackerId: z.string().uuid(),
-  description: z.string().min(1).max(255),
-  details: z.string().min(1).max(255),
+  description: z.string().min(1),
+  details: z.string().min(1),
 });
 
 export type SubmissionCreateType = z.infer<typeof submissionCreateSchema>;
