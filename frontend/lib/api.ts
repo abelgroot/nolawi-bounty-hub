@@ -53,6 +53,7 @@ export async function apiPost<T>(
       : await axios.post(API_URL + url, payload, { headers: finalHeaders });
 
   const data: T = humps.camelizeKeys(response.data) as T;
+  console.log(data);
   const validatedData = schema.parse(data);
 
   return {

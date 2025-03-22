@@ -45,7 +45,6 @@ export function useAuth() {
       alert?.error("Invalid email or password");
     },
   });
-
   const signUpUser = async ({
     user,
   }: {
@@ -82,8 +81,6 @@ export function useAuth() {
     });
     router.push("/auth/login");
   };
-
-  console.log(loginMutation.error);
 
   return {
     signUp: signUpMutation.mutate,
