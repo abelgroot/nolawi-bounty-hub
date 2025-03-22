@@ -14,7 +14,7 @@ export default function Footer() {
         </div>
         <div className="flex gap-4">
           <Link
-            href="https://github.com/abelgroot"
+            href="https://github.com/abelgroot/nolawi-bounty-hub"
             className="text-muted-foreground hover:text-foreground"
           >
             <Github className="h-5 w-5" />
