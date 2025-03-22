@@ -1,6 +1,6 @@
 # Nolawi Bounty Hub
 
-![Nolawi Bounty Hub Cover Image](assets/cover-image.png)
+![Nolawi Bounty Hub Cover Image](assets/main-image.png)
 
 **Nolawi Bounty Hub** is a platform designed to connect white-hackers and clients, enabling them to collaborate on projects seamlessly. Whether you're a freelancer looking for bounties or a client seeking skilled professionals, Nolawi Bounty Hub simplifies the process.
 
