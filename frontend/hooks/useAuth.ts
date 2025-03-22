@@ -45,6 +45,7 @@ export function useAuth() {
       alert?.error("Invalid email or password");
     },
   });
+
   const signUpUser = async ({
     user,
   }: {
@@ -54,6 +55,7 @@ export function useAuth() {
   }) => {
     const response = await apiPost<User>("/api/v1/users", userSchema, {
       email: user.email,
+      name: user.name,
       password: user.password,
       role: user.role,
     });

@@ -18,6 +18,7 @@ export const userSchema = z.object({
 export const userCreateSchema = z
   .object({
     email: z.string().email({ message: "Invalid email address" }),
+    name: z.string().min(3).max(50),
     password: z.string().min(4).max(100),
     repeatPassword: z.string().min(4).max(100),
     role: UserRoleEnum,
@@ -29,6 +30,7 @@ export const userCreateSchema = z
 
 export const userSaveSchema = z.object({
   email: z.string(),
+  name: z.string(),
   password: z.string(),
   role: UserRoleEnum,
 });

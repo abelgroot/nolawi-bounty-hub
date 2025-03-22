@@ -59,6 +59,7 @@ export function SignUpForm({
     resolver: zodResolver(userCreateSchema),
     defaultValues: {
       email: "",
+      name: "",
       password: "",
       repeatPassword: "",
     },
@@ -88,6 +89,24 @@ export function SignUpForm({
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-8 pb-20"
             >
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Name"
+                        {...field}
+                        disabled={isSigningUp}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="email"

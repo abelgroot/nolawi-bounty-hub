@@ -30,6 +30,7 @@ class User(SQLModel, table=True):
 
 class UserCreate(BaseModel):
     email: EmailStr
+    name: str
     password: str
     role: UserType
 

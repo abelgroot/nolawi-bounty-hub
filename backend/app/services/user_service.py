@@ -24,6 +24,7 @@ class UserService:
             hashed_password = bcrypt.hashpw(user_create.password.encode("utf-8"), bcrypt.gensalt())
             user = User(
                 email=user_create.email,
+                name=user_create.name,
                 password=hashed_password.decode(),
                 role=user_create.role,
             )
