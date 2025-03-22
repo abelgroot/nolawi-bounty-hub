@@ -1,6 +1,7 @@
 # General
 .DS_Store
 Thumbs.db
+commit.git
 
 # Virtual Environment (Python)
 venv/
