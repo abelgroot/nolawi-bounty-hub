@@ -8,6 +8,7 @@ export type UserRole = z.infer<typeof UserRoleEnum>;
 
 export const userSchema = z.object({
   id: z.string().uuid(),
+  name: z.string(),
   email: z.string(),
   role: UserRoleEnum,
   createdAt: z.coerce.date(),

@@ -35,7 +35,7 @@ export default function AdminDashboard() {
   return (
     <div className="p-10">
       <h2 className="text-xl font-semibold p-4 border-b mb-6 flex justify-between items-center">
-        <div>Admin : {user?.email}</div>
+        <div>Admin : {user?.name}</div>
         {isOpen && <ReviewProgramModal isOpen={isOpen} setIsOpen={setIsOpen} />}
       </h2>
       <div className="p-4 w-full">

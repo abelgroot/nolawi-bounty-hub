@@ -83,6 +83,8 @@ export function useAuth() {
     router.push("/auth/login");
   };
 
+  console.log(loginMutation.error);
+
   return {
     signUp: signUpMutation.mutate,
     isSigningUp: signUpMutation.isPending,

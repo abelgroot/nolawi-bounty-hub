@@ -24,8 +24,8 @@ export default function HackerDashboard() {
 
   return (
     <div className="p-10">
-      <h2 className="text-xl font-semibold p-4 border-b mb-6">
-        Hacker ID: {user?.email}
+      <h2 className="text-xl font-semibold p-4 border-b mb-6 capitalize">
+        Hacker: {user?.name}
       </h2>
       <div className="grid grid-cols-2">
         <div className="p-4 w-full">
@@ -84,9 +84,13 @@ export default function HackerDashboard() {
               <Link
                 href={`/internal/company/${company.id}`}
                 key={idx}
-                className="h-[150px] w-[150px] bg-slate-200 rounded-full hover:ring-1 hover:ring-sky-400"
-              ></Link>
-              <p>{company.email}</p>
+                className="h-[150px] w-[150px] flex justify-center items-center bg-slate-100/50 border border-slate-400/60 rounded-full hover:ring-1 hover:ring-sky-400"
+              >
+                <span className="uppercase text-5xl font-bold text-slate-500">
+                  {company.name.slice(0, 2)}
+                </span>
+              </Link>
+              <p>{company.name}</p>
             </div>
           ))}
         </div>

@@ -15,7 +15,7 @@ export default function CompanyDashboard() {
   return (
     <div className="p-10">
       <h2 className="text-xl font-semibold p-4 border-b mb-6 flex justify-between items-center">
-        <div>Campnay : {user?.email}</div>
+        <div className="capitalize">Company : {user?.name}</div>
         <Button onClick={() => setIsOpen(true)}>Add Program</Button>
         {isOpen && <AddProgramModal isOpen={isOpen} setIsOpen={setIsOpen} />}
       </h2>
