@@ -91,13 +91,6 @@ Before running the project, ensure you have the following installed:
    make -j3 all
    ```
 
-   Alternatively, you can use `concurrently` for better log management:
-
-   ```bash
-   npm install -g concurrently
-   make start-services
-   ```
-
 2. Access the application:
    - Frontend: `http://localhost:3000`
    - Backend: `http://localhost:8000`
@@ -134,7 +127,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ---
 
 Thank you for visiting Nolawi Bounty Hub! We hope this platform helps Ethiopian and African companies secure their digital platforms while empowering whitehat hackers and bounty hunters to make a difference. 🚀
-
-```
-
-```
