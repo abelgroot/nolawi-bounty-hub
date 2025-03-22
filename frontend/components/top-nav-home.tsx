@@ -3,6 +3,8 @@ import { Button } from "./ui/button";
 import { Shield } from "lucide-react";
 
 export default function TopNavHome() {
+  console.log(process.env.NEXT_PUBLIC_ISLANDINGPAGE);
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
@@ -33,11 +35,13 @@ export default function TopNavHome() {
           </nav>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-4">
-          <Link href="/auth/login">
-            <Button variant="outline" className="hidden md:flex">
-              Log in
-            </Button>
-          </Link>
+          {process.env.NEXT_PUBLIC_ISLANDINGPAGE == "true" ? null : (
+            <Link href="/auth/login">
+              <Button variant="outline" className="hidden md:flex">
+                Log in
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </header>
