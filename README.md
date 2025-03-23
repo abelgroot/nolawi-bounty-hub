@@ -67,8 +67,11 @@ Before running the project, ensure you have the following installed:
    cd nolawi-bounty-hub
    ```
 
-
-2. Install dependencies for the frontend:
+2. pull docker image postgresql 17.4 if not available locally.
+   ```bash
+   docker compose up db
+   ```
+3. Install dependencies for the frontend (you can do it on second terminal while image is downloading):
 
    ```bash
    cd frontend
@@ -76,11 +79,26 @@ Before running the project, ensure you have the following installed:
    cd ..
    ```
 
-3. Set up the backend:
+4. Set up the backend:
    ```bash
    cd backend
-   pip install -r requirements.txt
-   cd ..
+   uv run --reinstall
+   ```
+5. setup db connection env.
+
+    - create a file named .env in backend folder. and create the follwoing information
+   ```bash
+   vim .env
+   ```
+
+   - copy the following information according to your db username and password. and create a signing_seceret as per your requirement.
+   ```
+   DB_CONNECTION_URL=postgresql://postgres:postgres@localhost:5432/nolawi_bounty_hub   
+   SIGNING_SECRET=AKDLAJDFIOJLK_+ALSDFKLEJLKAJSDF
+   ```
+
+   ```bash
+   make migrate-db
    ```
 
 ### Running the System
