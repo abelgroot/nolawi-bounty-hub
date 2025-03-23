@@ -1,4 +1,4 @@
-````markdown
+
 # Nolawi Bounty Hub
 
 ![Nolawi Bounty Hub Cover Image](assets/main-page.png)
@@ -66,7 +66,7 @@ Before running the project, ensure you have the following installed:
    git clone https://github.com/abelgroot/nolawi-bounty-hub.git
    cd nolawi-bounty-hub
    ```
-````
+
 
 2. Install dependencies for the frontend:
 
