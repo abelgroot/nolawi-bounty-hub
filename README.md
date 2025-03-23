@@ -99,6 +99,7 @@ Before running the project, ensure you have the following installed:
 
    ```bash
    make migrate-db
+   cd ..
    ```
 
 ### Running the System
