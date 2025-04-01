@@ -1,3 +1,5 @@
+"""Participant routes module."""
+
 from uuid import UUID
 
 from fastapi import APIRouter
@@ -40,4 +42,6 @@ async def delete_participant(
     session: SessionDep,
 ):
     participant_service = ParticipantService(session)
-    return participant_service.delete_participant(program_id=program_id, hacker_id=hacker_id)
+    return participant_service.delete_participant(
+        program_id=program_id, hacker_id=hacker_id
+    )

@@ -1,3 +1,5 @@
+"""Bounty Program Routes"""
+
 import traceback
 from uuid import UUID
 

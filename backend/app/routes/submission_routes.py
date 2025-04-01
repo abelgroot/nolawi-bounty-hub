@@ -1,3 +1,5 @@
+"""a submissions router for fastapi"""
+
 import traceback
 from uuid import UUID
 

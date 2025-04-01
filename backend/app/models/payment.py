@@ -1,13 +1,26 @@
+"""
+payment model class
+"""
+
 import enum
 from datetime import datetime
 from uuid import UUID, uuid4
 
 from sqlmodel import Column, Enum, Field, SQLModel
 
+"""
+payment create model class
+"""
+
 
 class PaymentStatus(str, enum.Enum):
     PENDING = "pending"
     PAID = "paid"
+
+
+"""
+payment update model class
+"""
 
 
 class Payment(SQLModel, table=True):
@@ -28,6 +41,11 @@ class Payment(SQLModel, table=True):
     transaction_id: UUID | None = None
 
 
+"""
+payment read model class
+"""
+
+
 class PaymentCreate(SQLModel):
     amount: float
     status: PaymentStatus = PaymentStatus.PENDING
@@ -35,6 +53,9 @@ class PaymentCreate(SQLModel):
     admin_id: UUID
     transaction_id: UUID | None = None
     paid_at: datetime | None = None
+
+
+"""payment read model class"""
 
 
 class PaymentRead(SQLModel):
@@ -47,6 +68,9 @@ class PaymentRead(SQLModel):
     admin_id: UUID
     paid_at: datetime | None = None
     transaction_id: UUID | None = None
+
+
+"""payment update model class"""
 
 
 class PaymentUpdate(SQLModel):

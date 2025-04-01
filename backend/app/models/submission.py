@@ -1,8 +1,16 @@
+"""
+submission model and related classes.
+"""
+
 import enum
 from datetime import datetime
 from uuid import UUID, uuid4
 
 from sqlmodel import Column, Enum, Field, SQLModel
+
+"""
+submissionstatus enum class
+"""
 
 
 class SubmissionStatus(enum.Enum):
@@ -11,9 +19,16 @@ class SubmissionStatus(enum.Enum):
     REJECTED = "rejected"
 
 
+"""
+submission model class
+"""
+
+
 class Submission(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
-    status: SubmissionStatus = Field(default=SubmissionStatus.PENDING, sa_column=Column(Enum(SubmissionStatus)))
+    status: SubmissionStatus = Field(
+        default=SubmissionStatus.PENDING, sa_column=Column(Enum(SubmissionStatus))
+    )
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(
         default_factory=datetime.now,
@@ -27,6 +42,11 @@ class Submission(SQLModel, table=True):
     feedback: str | None = None
 
 
+"""
+submission create model class
+"""
+
+
 class SubmissionCreate(SQLModel):
     program_id: UUID
     hacker_id: UUID
@@ -34,14 +54,29 @@ class SubmissionCreate(SQLModel):
     details: str
 
 
+"""
+submission update model class
+"""
+
+
 class SubmissionUpdate(SQLModel):
     description: str
     details: str
 
 
+"""
+submission update feedback model class
+"""
+
+
 class SubmissionUpdateFeedback(SQLModel):
     status: SubmissionStatus
     feedback: str | None = None
+
+
+"""
+submission read model class
+"""
 
 
 class SubmissionRead(SQLModel):

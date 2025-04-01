@@ -1,3 +1,7 @@
+"""
+User model and related classes.
+"""
+
 import enum
 from datetime import datetime
 from uuid import UUID, uuid4
@@ -6,11 +10,20 @@ from pydantic import BaseModel, EmailStr
 from pydantic import BaseModel as PydanticBaseModel
 from sqlmodel import Column, Enum, Field, SQLModel
 
+"""
+User model and related classes.
+"""
+
 
 class UserType(str, enum.Enum):
     HACKER = "hacker"
     COMPANY = "company"
     ADMIN = "admin"
+
+
+"""
+User model and related classes.
+"""
 
 
 class User(SQLModel, table=True):
@@ -28,11 +41,21 @@ class User(SQLModel, table=True):
     )
 
 
+"""
+User model and related classes.
+"""
+
+
 class UserCreate(BaseModel):
     email: EmailStr
     name: str
     password: str
     role: UserType
+
+
+"""
+User model and related classes.
+"""
 
 
 class UserRead(SQLModel):
@@ -44,14 +67,29 @@ class UserRead(SQLModel):
     updated_at: datetime
 
 
+"""
+User model and related classes.
+"""
+
+
 class UserUpdate(BaseModel):
     email: EmailStr | None = None
     password: str | None = None
 
 
+"""
+User model and related classes.
+"""
+
+
 class Token(PydanticBaseModel):
     access_token: str
     token_type: str
+
+
+"""
+User model and related classes.
+"""
 
 
 class AuthUser(PydanticBaseModel):
