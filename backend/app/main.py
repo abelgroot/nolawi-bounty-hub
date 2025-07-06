@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from a2wsgi import ASGIMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes.bountyprogram_routes import bountyprogram_router
@@ -26,3 +27,6 @@ subapp.include_router(bountyprogram_router)
 subapp.include_router(participant_router)
 subapp.include_router(submission_router)
 subapp.include_router(payment_router)
+
+# Wrap FastAPI ASGI app as WSGI
+wsgi_app = ASGIMiddleware(app)

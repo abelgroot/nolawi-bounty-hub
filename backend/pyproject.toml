@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "a2wsgi>=1.10.10",
     "alembic>=1.15.1",
     "alembic-postgresql-enum>=1.7.0",
     "bcrypt>=4.3.0",
