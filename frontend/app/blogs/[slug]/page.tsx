@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, Clock, User, ArrowLeft } from "lucide-react";
 import { getBlogPost, getAllBlogSlugs } from "@/lib/blog-data";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
@@ -18,16 +20,11 @@ export async function generateStaticParams() {
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
-  const post = getBlogPost(slug);
+  const post = await getBlogPost(slug);
 
   if (!post) {
     notFound();
   }
-
-  // Dynamically import the MDX file as a compiled React component
-  // Next.js + @next/mdx will compile it at build time
-  // three “..” segments to go from app/blog/[slug]/page.tsx → /
-  const { default: PostContent } = await import(`../../../content/${slug}.mdx`);
 
   return (
     <div className="min-h-screen bg-background">
@@ -77,8 +74,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           {/* Front-matter excerpt */}
           <p className="text-lg text-muted-foreground mb-8">{post.excerpt}</p>
 
-          {/* Render the compiled MDX component */}
-          <PostContent />
+          <div className="prose lg:prose-xl">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {post.content ?? ""}
+            </ReactMarkdown>
+          </div>
         </article>
 
         {/* Navigation */}

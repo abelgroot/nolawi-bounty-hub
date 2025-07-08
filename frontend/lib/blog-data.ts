@@ -19,9 +19,9 @@ export function getBlogPosts(): BlogPost[] {
   try {
     const fileNames = fs.readdirSync(contentDirectory);
     const allPostsData = fileNames
-      .filter((fileName) => fileName.endsWith(".mdx"))
+      .filter((fileName) => fileName.endsWith(".md"))
       .map((fileName) => {
-        const slug = fileName.replace(/\.mdx$/, "");
+        const slug = fileName.replace(/\.md$/, "");
         const fullPath = path.join(contentDirectory, fileName);
         const fileContents = fs.readFileSync(fullPath, "utf8");
         const { data } = matter(fileContents);
@@ -48,43 +48,37 @@ export function getBlogPosts(): BlogPost[] {
   }
 }
 
-export function getBlogPost(slug: string): BlogPost | null {
-  try {
-    const fullPath = path.join(contentDirectory, `${slug}.mdx`);
+export async function getBlogPost(slug: string): Promise<BlogPost> {
+  const contentDirectory = path.join(process.cwd(), "content");
+  const blogPath = path.join(contentDirectory, `${slug}.md`);
+  const fileContents = fs.readFileSync(blogPath, "utf8");
+  const { data, content } = matter(fileContents);
 
-    if (!fs.existsSync(fullPath)) {
-      return null;
-    }
+  const excerpt =
+    data.excerpt ||
+    content
+      .split("\n")
+      .find((line) => line.trim())
+      ?.slice(0, 200) ||
+    "";
 
-    const fileContents = fs.readFileSync(fullPath, "utf8");
-    const { data, content } = matter(fileContents);
-    console.log(data);
-    console.log(
-      "------------------------------------------------------------------------------\n\n\n",
-    );
-    console.log(content);
-
-    return {
-      slug,
-      title: data.title || "Untitled",
-      excerpt: data.excerpt || "",
-      author: data.author || "Anonymous",
-      date: data.date || "",
-      readTime: data.readTime || "5 min read",
-      tags: data.tags || [],
-      content,
-    };
-  } catch (error) {
-    console.error(`Error reading blog post ${slug}:`, error);
-    return null;
-  }
+  return {
+    slug,
+    title: data.title,
+    excerpt,
+    author: data.author,
+    date: data.date,
+    readTime: data.readTime,
+    tags: data.tags || [],
+    content,
+  };
 }
 
 export function getAllBlogSlugs(): string[] {
   try {
     const fileNames = fs.readdirSync(contentDirectory);
     return fileNames
-      .filter((fileName) => fileName.endsWith(".mdx"))
+      .filter((fileName) => fileName.endsWith(".md"))
       .map((fileName) => fileName.replace(/\.mdx$/, ""));
   } catch (error) {
     console.error("Error reading blog slugs:", error);

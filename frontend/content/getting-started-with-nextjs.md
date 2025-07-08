@@ -24,9 +24,9 @@ Next.js offers several advantages over traditional React applications:
 
 Getting started with Next.js is incredibly simple. You can create a new project using the following command:
 
-\`\`\`bash
+```bash
 npx create-next-app@latest my-app
-\`\`\`
+```
 
 ## Key Features
 
@@ -43,4 +43,3 @@ You can create API endpoints directly within your Next.js application by adding 
 ## Conclusion
 
 Next.js is an excellent choice for building modern web applications. Its combination of performance, developer experience, and powerful features makes it suitable for projects of all sizes.
-\`\`\`

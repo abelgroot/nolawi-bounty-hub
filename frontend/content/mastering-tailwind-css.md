@@ -51,4 +51,3 @@ Implement dark mode using Tailwind's built-in dark mode utilities with the `dark
 ## Conclusion
 
 Tailwind CSS is a powerful tool that can significantly speed up your development process while maintaining design consistency. With practice and the right techniques, you'll be creating beautiful interfaces in no time.
-\`\`\`

