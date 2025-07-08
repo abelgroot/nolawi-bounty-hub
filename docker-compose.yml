@@ -34,26 +34,26 @@ services:
     build: ./backend
     ports:
       - "8000:8000"
-    volumes:
-      - ./backend/app:/app/app
+    # volumes:
+    #   - ./backend/app:/app/app
     depends_on:
       db:
         condition: service_healthy
         restart: true
     environment:
-      - DB_CONNECTION_URL=postgresql://postgres:postgres@host.docker.internal:5432/nolawi_bounty_hub
+      - DB_CONNECTION_URL=postgresql://postgres:postgres@db:5432/nolawi_bounty_hub
     command: uv run fastapi dev --host  0.0.0.0
 
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-    depends_on:
-      - backend
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./frontend:/app
+  #   environment:
+  #     - CHOKIDAR_USEPOLLING=true
+  #   depends_on:
+  #     - backend
 
 volumes:
   postgres_data:
