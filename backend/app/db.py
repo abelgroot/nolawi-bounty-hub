@@ -1,26 +1,24 @@
 from typing import Annotated
-
 from fastapi import Depends
 from sqlalchemy import create_engine
 from sqlmodel import Session
 
 from app.config import Config, get_config
 
+# Load config and create engine ONCE
+config = get_config()
+engine = create_engine(
+    url=config.db_connection_url,
+    echo=False,
+    pool_pre_ping=True,
+    pool_size=5,        # Be careful with Supabase limits
+    max_overflow=2,     # You can tune this as needed
+)
 
-def get_engine(config: Config):
-    return create_engine(
-        url=config.db_connection_url,
-        echo=False,
-        pool_pre_ping=True,
-        pool_size=50,
-        max_overflow=10,
-    )
-
-
+# Dependency function that yields a session from the global engine
 def get_session():
-    engine = get_engine(config=get_config())
     with Session(engine) as session:
         yield session
 
-
+# FastAPI dependency annotation
 SessionDep = Annotated[Session, Depends(get_session)]
