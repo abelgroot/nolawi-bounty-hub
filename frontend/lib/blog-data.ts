@@ -79,7 +79,7 @@ export function getAllBlogSlugs(): string[] {
     const fileNames = fs.readdirSync(contentDirectory);
     return fileNames
       .filter((fileName) => fileName.endsWith(".md"))
-      .map((fileName) => fileName.replace(/\.mdx$/, ""));
+      .map((fileName) => fileName.replace(/\.md$/, ""));
   } catch (error) {
     console.error("Error reading blog slugs:", error);
     return [];
