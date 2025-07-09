@@ -11,13 +11,39 @@ from app.models.submission import (
     SubmissionRead,
     SubmissionUpdate,
     SubmissionUpdateFeedback,
+    Submission
 )
 from app.models.user import UserType
 from app.services.participant_service import ParticipantService
 from app.services.submission_service import SubmissionService
 from app.services.user_service import UserService
+from app.cache.redis_client import redis_client
+from app.cache.cache_decorator import redis_cache
 
 submission_router = APIRouter(prefix="/submissions", tags=["Submissions"])
+
+def submissions_key_builder(request: Request, session: SessionDep):
+    user_service = UserService(session)
+    user = user_service.get_current_user(request)
+
+    if not user:
+        return "submissions:public:list"
+
+    if user.role == UserType.ADMIN:
+        return "submissions:admin:list"
+    elif user.role == UserType.HACKER:
+        return f"submissions:hacker:{user.id}:list"
+
+    return f"submissions:user:{user.id}:list"
+
+
+def submission_key_builder(submission_id: UUID, session: SessionDep):
+    return f"submission:{str(submission_id)}"
+
+
+async def invalidate_submission_caches(hacker_id: UUID | str):
+    await redis_client.delete(f"submissions:hacker:{hacker_id}:list")
+    await redis_client.delete("submissions:admin:list")
 
 
 @submission_router.post("/", response_model=SubmissionRead)
@@ -39,10 +65,12 @@ async def create_submission(submission: SubmissionCreate, session: SessionDep):
         participant=participant,
         submission_create=submission,
     )
+    await invalidate_submission_caches(submission.hacker_id)
     return new_submission
 
 
 @submission_router.get("/")
+@redis_cache(key_builder=submissions_key_builder, ttl=60, model_class=Submission)
 async def get_submissions(request: Request, session: SessionDep):
     try:
         user_service = UserService(session)
@@ -78,6 +106,7 @@ async def update_submission(
 ):
     submission_service = SubmissionService(session)
     submission = submission_service.update_submission(submission_id, submission_update)
+    await invalidate_submission_caches(submission.hacker_id)
     return submission
 
 
@@ -104,6 +133,7 @@ async def update_submission_feedback(
             updater=user,
             submission_updatefeedback=submission_update_feedback,
         )
+        await invalidate_submission_caches(submission.hacker_id)
         return submission
 
     except Exception:
