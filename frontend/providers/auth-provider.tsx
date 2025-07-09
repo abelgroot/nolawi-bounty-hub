@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (isTokenLoaded && !token) {
-      router.push("/auth/login");
+      router.push("/");
     }
   }, [isTokenLoaded, token, router]);
 

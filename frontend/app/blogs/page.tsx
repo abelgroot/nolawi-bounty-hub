@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Clock, User } from "lucide-react";
+import { CalendarDays, Clock, User, ChevronLeft } from "lucide-react";
 import { getBlogPosts } from "@/lib/blog-data";
 
 export default function BlogListPage() {
@@ -12,7 +12,12 @@ export default function BlogListPage() {
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold">My Blog</h1>
+          <div className="flex gap-4 justify-start items-center">
+            <Link href="/internal">
+              <ChevronLeft />
+            </Link>
+            <h1 className="text-3xl font-bold">My Blog</h1>
+          </div>
           <p className="text-muted-foreground mt-2">
             Thoughts, stories and ideas from my journey
           </p>

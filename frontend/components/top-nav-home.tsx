@@ -32,6 +32,12 @@ export default function TopNavHome() {
             >
               Testimonials
             </Link>
+            <Link
+              href="/blogs"
+              className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Blogs
+            </Link>
           </nav>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-4">
