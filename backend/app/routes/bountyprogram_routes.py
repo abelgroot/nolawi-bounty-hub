@@ -1,10 +1,10 @@
 import traceback
 from uuid import UUID
-from app.cache.cache_decorator import redis_cache
-from app.cache.redis_client import redis_client
 
 from fastapi import APIRouter, HTTPException, Request, status
 
+from app.cache.cache_decorator import redis_cache
+from app.cache.redis_client import redis_client
 from app.db import SessionDep
 from app.models.bountyprogram import (
     BountyProgramCreate,
@@ -57,10 +57,12 @@ async def create_bountyprogram(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Only companies can create bounty programs.",
             )
-
+        user_id = user.id
         bountyprogram_service = BountyProgramService(session)
-        new_bountyprogram = bountyprogram_service.create_bountyprogram(user=user, bountyprogram_create=bountyprogram)
-        await invalidate_bountyprogram_caches(user.id)
+        new_bountyprogram = bountyprogram_service.create_bountyprogram(
+            user_id=user_id, bountyprogram_create=bountyprogram
+        )
+        await invalidate_bountyprogram_caches(user_id)
         return new_bountyprogram
     except Exception:
         print(traceback.format_exc())
@@ -69,8 +71,11 @@ async def create_bountyprogram(
             detail="Your are not authorized to access this resource.",
         )
 
+
 @bountyprogram_router.get("/")
-@redis_cache(key_builder=bountyprograms_key_builder, ttl=60, model_class=BountyProgramRead)
+@redis_cache(
+    key_builder=bountyprograms_key_builder, ttl=60, model_class=BountyProgramRead
+)
 async def get_all_bountyprograms(
     request: Request,
     session: SessionDep,
@@ -100,12 +105,16 @@ async def get_all_bountyprograms(
             detail="Your are not authorized to access this resource.",
         )
 
+
 @bountyprogram_router.get("/{bountyprogram_id}")
-@redis_cache(key_builder=bountyprogram_key_builder, ttl=120, model_class=BountyProgramRead)
+@redis_cache(
+    key_builder=bountyprogram_key_builder, ttl=120, model_class=BountyProgramRead
+)
 async def get_bountyprogram(bountyprogram_id: UUID, session: SessionDep):
     bountyprogram_service = BountyProgramService(session)
     bountyprogram = bountyprogram_service.get_bountyprogram(bountyprogram_id)
     return bountyprogram
+
 
 @bountyprogram_router.post("/{bountyprogram_id}")
 async def update_bountyprogram(
@@ -118,7 +127,9 @@ async def update_bountyprogram(
     program = bountyprogram_service.get_bountyprogram(bountyprogram_id)
     await invalidate_bountyprogram_caches(program.owner_id)
 
-    bountyprograms = bountyprogram_service.update_bountyprogram(bountyprogram_id, bountyprogram_update)
+    bountyprograms = bountyprogram_service.update_bountyprogram(
+        bountyprogram_id, bountyprogram_update
+    )
     return bountyprograms
 
 

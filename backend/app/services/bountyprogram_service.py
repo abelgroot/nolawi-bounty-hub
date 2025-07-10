@@ -1,3 +1,4 @@
+import logging
 import traceback
 from uuid import UUID
 
@@ -14,7 +15,10 @@ from app.models.bountyprogram import (
 )
 from app.models.participant import Participant
 from app.models.submission import Submission
-from app.models.user import User
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler())
 
 
 class BountyProgramService:
@@ -22,15 +26,16 @@ class BountyProgramService:
         self.session = session
 
     def create_bountyprogram(
-        self, user: User, bountyprogram_create: BountyProgramCreate
+        self, user_id: UUID, bountyprogram_create: BountyProgramCreate
     ) -> BountyProgramRead:
         program_query = select(BountyProgram).where(
-            BountyProgram.owner_id == user.id,
+            BountyProgram.owner_id == user_id,
             BountyProgram.name == bountyprogram_create.name,
         )
         program_result = self.session.execute(program_query)
         program = program_result.scalar_one_or_none()
 
+        logger.debug(f"Found program : {program}")
         if program:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -40,7 +45,7 @@ class BountyProgramService:
             name=bountyprogram_create.name,
             description=bountyprogram_create.description,
             reward_amount=bountyprogram_create.reward_amount,
-            owner_id=user.id,
+            owner_id=user_id,
             status=ProgramStatus.OPEN,
         )
 
