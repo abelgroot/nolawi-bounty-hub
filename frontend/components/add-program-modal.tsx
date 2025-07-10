@@ -6,7 +6,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
@@ -148,6 +147,11 @@ export function AddProgramModal({
                         type="number"
                         min={100}
                         name="rewardAmount"
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value === "" ? "" : Number(e.target.value),
+                          )
+                        }
                       />
                     </FormControl>
                     <FormMessage />
