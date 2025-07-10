@@ -3,6 +3,7 @@ import traceback
 from uuid import UUID
 
 from fastapi import HTTPException, status
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from sqlmodel import select
 
@@ -61,6 +62,7 @@ class BountyProgramService:
         programs = (
             self.session.query(BountyProgram)
             .where(BountyProgram.id.in_(submitted_program_ids))
+            .order_by(desc(BountyProgram.updated_at))
             .all()
         )
         return programs
@@ -73,6 +75,7 @@ class BountyProgramService:
             return (
                 self.session.query(BountyProgram)
                 .where(BountyProgram.owner_id == user_id)
+                .order_by(desc(BountyProgram.updated_at))
                 .all()
             )
         else:
@@ -82,6 +85,7 @@ class BountyProgramService:
         return (
             self.session.query(BountyProgram)
             .where(BountyProgram.owner_id == company_id)
+            .order_by(desc(BountyProgram.updated_at))
             .all()
         )
 
@@ -97,6 +101,7 @@ class BountyProgramService:
         return (
             self.session.query(BountyProgram)
             .where(BountyProgram.id.in_(program_ids))
+            .order_by(desc(BountyProgram.updated_at))
             .all()
         )
 

@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from fastapi import HTTPException, status
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from sqlmodel import select
 
@@ -43,11 +44,15 @@ class SubmissionService:
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="you are not authorized to submit for this program",
             )
-        program_query = select(BountyProgram).where(BountyProgram.id == participant.program_id)
+        program_query = select(BountyProgram).where(
+            BountyProgram.id == participant.program_id
+        )
         program_status = self.session.execute(program_query)
         program = program_status.scalar_one_or_none()
         if not program:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="no program found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="no program found"
+            )
         if program.status == ProgramStatus.CLOSED:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -70,16 +75,23 @@ class SubmissionService:
         return SubmissionRead.from_orm(submission)
 
     def get_submissions(self, hacker_id: UUID) -> list[Submission]:
-        return self.session.query(Submission).where(Submission.hacker_id == hacker_id).all()
+        return (
+            self.session.query(Submission)
+            .where(Submission.hacker_id == hacker_id)
+            .order_by(desc(Submission.updated_at))
+            .all()
+        )
 
     def get_all_sumissions(self) -> list[Submission]:
-        return self.session.query(Submission).order_by(Submission.updated_at).all()
+        return (
+            self.session.query(Submission).order_by(desc(Submission.updated_at)).all()
+        )
 
     def get_submissions_by_user(self, hacker_id: UUID) -> list[Submission]:
         return (
             self.session.query(Submission)
             .where(Submission.hacker_id == hacker_id)
-            .order_by(Submission.updated_at)
+            .order_by(desc(Submission.updated_at))
             .all()
         )
 
@@ -94,7 +106,9 @@ class SubmissionService:
             )
         return submission
 
-    def update_submission(self, submission_id: UUID, submission_update: SubmissionUpdate) -> SubmissionRead:
+    def update_submission(
+        self, submission_id: UUID, submission_update: SubmissionUpdate
+    ) -> SubmissionRead:
         query = select(Submission).where(Submission.id == submission_id)
         result = self.session.execute(query)
         submission = result.scalar_one_or_none()

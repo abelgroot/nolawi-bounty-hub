@@ -2,6 +2,7 @@ import traceback
 from uuid import UUID
 
 from fastapi import HTTPException, status
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from sqlmodel import select
 
@@ -13,20 +14,26 @@ class ParticipantService:
     def __init__(self, session: Session):
         self.session = session
 
-    def create_participant(self, participant_create: ParticipantCreate) -> ParticipantRead:
+    def create_participant(
+        self, participant_create: ParticipantCreate
+    ) -> ParticipantRead:
         # Check if the hacker is already participating in the program
         existing_participant_query = select(Participant).where(
             Participant.hacker_id == participant_create.hacker_id,
             Participant.program_id == participant_create.program_id,
         )
-        existing_participant = self.session.execute(existing_participant_query).scalar_one_or_none()
+        existing_participant = self.session.execute(
+            existing_participant_query
+        ).scalar_one_or_none()
 
         if existing_participant:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Hacker is already participating in this program",
             )
-        user_query = select(BountyProgram).where(BountyProgram.id == participant_create.program_id)
+        user_query = select(BountyProgram).where(
+            BountyProgram.id == participant_create.program_id
+        )
         result = self.session.execute(user_query)
         program = result.scalar_one_or_none()
 
@@ -54,7 +61,9 @@ class ParticipantService:
         self.session.close()
         return ParticipantRead.from_orm(participant)
 
-    def get_participation(self, hacker_id: UUID, program_id: UUID) -> Participant | None:
+    def get_participation(
+        self, hacker_id: UUID, program_id: UUID
+    ) -> Participant | None:
         query = select(Participant).where(
             Participant.hacker_id == hacker_id,
             Participant.program_id == program_id,
@@ -65,7 +74,11 @@ class ParticipantService:
         query = select(Participant).where(Participant.hacker_id == hacker_id)
         participants = self.session.execute(query).scalars().all()
         program_ids = [participant.program_id for participant in participants]
-        query = select(BountyProgram).where(BountyProgram.id.in_(program_ids))
+        query = (
+            select(BountyProgram)
+            .where(BountyProgram.id.in_(program_ids))
+            .order_by(desc(BountyProgram.updated_at))
+        )
         programs = self.session.execute(query).scalars().all()
         return list(programs)
 
